@@ -1,0 +1,23 @@
+{
+  "name": "fgs_agama",
+  "version": "1.0.0",
+  "description": "convert fgs agama to kmf format",
+  "main": "index.js",
+  "dependencies": {
+    "iconv-lite": "^0.4.13"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dhamma/fgs_agama.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dhamma/fgs_agama/issues"
+  },
+  "homepage": "https://github.com/dhamma/fgs_agama#readme"
+}
