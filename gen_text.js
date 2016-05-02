@@ -1,18 +1,30 @@
 var iconv=require("iconv-lite");
 var fs=require("fs");
 var lst=fs.readFileSync("text.lst","utf8").split(/\r?\n/);
-var max=5,count=0;
+var count=0;
+var max=0; //set to 0 for all files
+var writeToDisk=false;
 
+var getBody=function(str,fn){
 
-var getBody=function(str){
-	var at=str.indexOf('<p style="line-height: 150%">');
+	if (fn==="1b042") {
+		var at=str.indexOf('0" bordercolordark="#800000">'); 
+	} else {
+		var at=str.indexOf('<p style="line-height: 150%">');
+	}
 	if (at<0) {
 		console.error("cannot find start",fn);
 		throw fn;
 	}
-	str=str.substr(at);	
+	str=str.substr(at+29);	
 
-	var at=str.lastIndexOf('</p>');
+	if (fn==="1b042" || fn==="1d008") {
+		var at=str.lastIndexOf('</td>');
+	} else {
+		var at=str.lastIndexOf('</p>');	
+	}
+	
+
 	if (at<0) {
 		console.error("cannot find end",fn);
 		throw fn;
@@ -29,10 +41,11 @@ var cleanups=[
 /<span style="font-size:12\.0pt;font-family:新細明體\n?/g
 ]
 
-var regex_nonbig5=/<span style="font-size: 12.0pt; font-family: 新細明體; mso-hansi-font-family: Foreign1; mso-bidi-font-family: Times New Roman; mso-font-kerning: 1.0pt; mso-ansi-language: EN-US; mso-fareast-language: ZH-TW; mso-bidi-language: AR-SA">&#(\d+);<\/span>/g
-var regex_nonbig52=/mso-bidi-language:AR-SA">&#(\d+);<\/span>/g
-var regex_nonbig53=/<span style="font-size: 12.0pt; font-family: 新細明體; mso-hansi-font-family: Times New Roman; mso-bidi-font-family: Times New Roman; mso-font-kerning: 1.0pt; mso-ansi-language: EN-US; mso-fareast-language: ZH-TW; mso-bidi-language: AR-SA">&#(\d+);<\/span>/g
-
+var regex_nonbig5= /<span style="font-size: 12.0pt; font-family: 新細明體; mso-hansi-font-family: Foreign1; mso-bidi-font-family: Times New Roman; mso-font-kerning: 1.0pt; mso-ansi-language: EN-US; mso-fareast-language: ZH-TW; mso-bidi-language: AR-SA">&#(\d+);<\/span>/g ;
+var regex_nonbig52=/<span style="font-size: 12.0pt; font-family: 新細明體; mso-hansi-font-family: Times New Roman; mso-bidi-font-family: Times New Roman; mso-font-kerning: 1.0pt; mso-ansi-language: EN-US; mso-fareast-language: ZH-TW; mso-bidi-language: AR-SA; background-color: #FFFFFF">&#(\d+);<\/span>/g ;
+var regex_nonbig53=/<span style="font-size: 12.0pt; font-family: 新細明體; mso-hansi-font-family: Times New Roman; mso-bidi-font-family: Times New Roman; mso-font-kerning: 1.0pt; mso-ansi-language: EN-US; mso-fareast-language: ZH-TW; mso-bidi-language: AR-SA">&#(\d+);<\/span>/g ;
+var regex_nonbig54=/<span style="font-size: 12.0pt; font-family: 新細明體; mso-hansi-font-family: Foreign1; mso-bidi-font-family: Times New Roman; mso-font-kerning: 1.0pt; mso-ansi-language: EN-US; mso-fareast-language: ZH-TW; mso-bidi-language: AR-SA; background-color: #FFFFFF">&#(\d+);<\/span>/g ;
+var regex_nonbig55=/mso-bidi-language:AR-SA">&#(\d+);<\/span>/g;
 var doNonBig5=function(str){
 	return str.replace(regex_nonbig5,function(m,m1){
 		//console.log(m1,String.fromCharCode(parseInt(m1)));
@@ -40,6 +53,10 @@ var doNonBig5=function(str){
 	}).replace(regex_nonbig52,function(m,m1){
 		return String.fromCharCode(parseInt(m1));
 	}).replace(regex_nonbig53,function(m,m1){
+		return String.fromCharCode(parseInt(m1));
+	}).replace(regex_nonbig54,function(m,m1){
+		return String.fromCharCode(parseInt(m1));
+	}).replace(regex_nonbig55,function(m,m1){
 		return String.fromCharCode(parseInt(m1));
 	});
 
@@ -77,6 +94,16 @@ var doSutraId=function(str){
 	return str;
 }
 var Agama={a:"s",b:"m",c:"d",d:"e"};
+var invalidnotefilecount=0;
+var getNoteFilename=function(fn){
+	var notefn=fn.replace(/-\d/,"");
+	var folder=fn.substr(0,2);
+	if (folder=="1d" || folder=="1b") {
+		notefn=folder+"\\d\\d\\d";
+	}
+	return notefn;
+}
+
 var processfile=function(fn){
 	if (max && count>max) return;
 	count++;
@@ -91,10 +118,11 @@ var processfile=function(fn){
 
 	targetfn=filename+".xml";
 
-	str=getBody(str);
+	str=getBody(str,filename);
 	str=doNonBig5(str);
 
-	var reg=regex_note.replace("^folder",fn.substr(0,2)).replace("^filename",filename);
+	var notefn=getNoteFilename(filename);
+	var reg=regex_note.replace("^folder",fn.substr(0,2)).replace("^filename",notefn);
 
 	str=doNote(str,new RegExp(reg,"g"),agama+juan);
 
@@ -112,7 +140,15 @@ var processfile=function(fn){
 	str=str.replace(/\n　+/g,"\n");
 
 	out=str;
-	console.log("writing",targetfn);
-	fs.writeFileSync("xml/"+targetfn,out,"utf8");
+	if (str.indexOf("<A HREF=")>-1) {
+		console.log(targetfn, "has invalid note");
+		invalidnotefilecount++;
+	} else {
+		//console.log("writing",targetfn);	
+	}
+	
+	if (writeToDisk) fs.writeFileSync("xml/"+targetfn,out,"utf8");
 };
 lst.forEach(processfile);
+console.log("total files",lst.length)
+console.log(invalidnotefilecount," files has invalid note");
