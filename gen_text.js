@@ -68,7 +68,7 @@ var doNote=function(str,regex,prefix){
 		if (m1!==m2||m2!==m3) {
 			throw "invalid note";
 		}
-		return '<note n="'+prefix+"."+m1+'"/>';
+		return '<note n="'+prefix+"."+m1+'"/>';1
 	});
 }
 
