@@ -48,6 +48,26 @@ var getBody=function(str,fn){
 }
 
 
+var fixHoles_2016_5_5=function(content,fn){ //found by checknote.js
+	var files=["1a016r","1a032r","1d009r"]
+	if (files.indexOf(fn)==-1) return content;
+
+	if (fn==="1a016r") {
+		content=content.replace(/\((10\d)\)/g,function(m,m1){
+			return '\n<ndef n="'+m1+'"/>';
+		});
+	} else if (fn==="1a032r") {
+		content=content.replace("(100)",function(m){
+			return '\n<ndef n="100"/>';
+		});
+	} else if (fn==="1d009r") {
+		content=content.replace("(115)",function(m,m1){
+			return '\n<ndef n="115"/>';
+		});
+	}
+	return content;
+}
+
 var processfile=function(fn){
 	if (max && count>max) return;
 	count++;
@@ -83,7 +103,8 @@ var processfile=function(fn){
 	str=str.replace(/\*\n<ndef n="(.+?)"/g,function(m,m1){
 		return '\n<ndef n="'+m1+'" star="1"';
 	});
-	out=str.trim();
+	str=str.trim();
+	out=fixHoles_2016_5_5(str,filename);
 	console.log(targetfn)
 	if (writeToDisk) fs.writeFileSync("xml_note/"+targetfn,out,"utf8");
 }
