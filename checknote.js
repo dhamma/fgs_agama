@@ -26,5 +26,5 @@ hole in  1a016r.xml  note 105
 hole in  1a032r.xml  note 101
 hole in  1d009r.xml  note 116
 
-wrong markup in html , need manual fix.
-*/
+wrong markup in html, fixed with gen_note.js fixHoles_2016_5_5
+*

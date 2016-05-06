@@ -3,7 +3,7 @@ var fs=require("fs");
 var lst=fs.readFileSync("text.lst","utf8").split(/\r?\n/);
 var count=0;
 var max=0; //set to 0 for all files
-var writeToDisk=false;
+var writeToDisk=true;
 
 var getBody=function(str,fn){
 
@@ -81,13 +81,21 @@ var regex_sutraid=/<b><font color="#800000">([一二三四五六七八九○].+)
 var regex_sutraid2=/<font color="#800000"><b>([一二三四五六七八九○]+)（([一二三四五六七八九○]+)）<\/b><\/font>/g
 var regex_sutraid3=/<font color="#800000">([一二三四五六七八九○]+)（([一二三四五六七八九○]+)）<\/font>/g
 
+var snum=[];
+
 var doSutraId=function(str){
 	str=str.replace(regex_sutraid,function(m,m1,m2){
-		return '<sid fgs="'+parseSid(m1)+'">'+m1+'</sid><sid taisho="'+parseSid(m2)+'">'+m2+'</sid>';
+		var n1=parseSid(m1), n2=parseSid(m2);
+		snum.push(n1+"\t"+n2);		
+		return '<sid n="'+n1+'"/>';//+m1+'</sid><sid taisho="'+n2+'">'+m2+'</sid>';
 	}).replace(regex_sutraid2,function(m,m1,m2){
-		return '<sid fgs="'+parseSid(m1)+'">'+m1+'</sid><sid taisho="'+parseSid(m2)+'">'+m2+'</sid>';
+		var n1=parseSid(m1), n2=parseSid(m2);
+		snum.push(n1+"\t"+n2);		
+		return '<sid n="'+n1+'"/>';//+m1+'</sid><sid taisho="'+n2+'">'+m2+'</sid>';
 	}).replace(regex_sutraid3,function(m,m1,m2){
-		return '<sid fgs="'+parseSid(m1)+'">'+m1+'</sid><sid taisho="'+parseSid(m2)+'">'+m2+'</sid>';
+		var n1=parseSid(m1), n2=parseSid(m2);
+		snum.push(n1+"\t"+n2);		
+		return '<sid n="'+n1+'"/>';//+m1+'</sid><sid taisho="'+n2+'">'+m2+'</sid>';
 	});
 
 	str=str.replace(/<b><sid/g,"<sid").replace(/<\/sid><\/b>/g,"</sid>");
@@ -150,5 +158,6 @@ var processfile=function(fn){
 	if (writeToDisk) fs.writeFileSync("xml/"+targetfn,out,"utf8");
 };
 lst.forEach(processfile);
+if (writeToDisk) fs.writeFileSync("foguang-taisho.txt",snum.join("\n"),"utf8");
 console.log("total files",lst.length)
 console.log(invalidnotefilecount," files has invalid note");
