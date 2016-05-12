@@ -155,7 +155,7 @@ var processfile=function(fn){
 		//console.log("writing",targetfn);	
 	}
 	
-	if (writeToDisk) fs.writeFileSync("xml/"+targetfn,out,"utf8");
+	if (writeToDisk) fs.writeFileSync("xml_gen/"+targetfn,out,"utf8");
 };
 lst.forEach(processfile);
 if (writeToDisk) fs.writeFileSync("foguang-taisho.txt",snum.join("\n"),"utf8");

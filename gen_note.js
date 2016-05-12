@@ -106,7 +106,7 @@ var processfile=function(fn){
 	str=str.trim();
 	out=fixHoles_2016_5_5(str,filename);
 	console.log(targetfn)
-	if (writeToDisk) fs.writeFileSync("xml_note/"+targetfn,out,"utf8");
+	if (writeToDisk) fs.writeFileSync("xml_note_gen/"+targetfn,out,"utf8");
 }
 
 lst.forEach(processfile);
