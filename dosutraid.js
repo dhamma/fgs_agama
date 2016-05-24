@@ -35,7 +35,10 @@ var processfile=function(fn){
 	var str=fs.readFileSync("xml/"+fn,"utf8");
 	out=doSutraId(str);
 	if (out!==str) {
-		console.log(fn);
-	}
+		console.log("overwrite",fn);
+		fs.writeFileSync("xml/"+fn,out,"utf8");
+	} 
 }
-lst.forEach(processfile)
+lst.forEach(processfile);
+
+fs.writeFileSync("foguang-taisho2.txt",snum.join("\n"),"utf8");
