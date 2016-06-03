@@ -38,6 +38,8 @@ var processfile=function(fn){
 		console.log("note count not match",fn,notes.length,ndef.length);
 		var dd=diff(ndef,notes);
 		if (dd.length) fs.writeFileSync(fn+"-missnote.txt",dd.join("\n"),"utf8");
+		fs.writeFileSync(fn+'-ndef.txt',ndef.join("\n"),'utf8');
+		fs.writeFileSync(fn+'-note.txt',notes.join("\n"),'utf8');
 	}
 
 }
