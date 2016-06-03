@@ -15,6 +15,12 @@ var processfile=function(fn) {
 		return;
 	}
 	var content=fs.readFileSync(fn,"utf8").replace(/\r?\n/g,"\n");
+	//add <p/> for beginning of paragraph
+
+	content.content.replace(/^([^<])/g,function(m,m1){
+		return "<p/>"+m1;
+	})
+
 	if (content[content.length-1]!=="\n") content+="\n";
 
 	out+=content;
