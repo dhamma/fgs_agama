@@ -1,3 +1,7 @@
+TODO
+*star  //repeat foot note
+juan marker %4 in ma1.txt
+
 # fgs_agama
 convert fgs agama to kmf format
 
@@ -7,4 +11,8 @@ node gen_text
 # convert note html to xml
 node gen_note
 
-//14分鐘標 48個頁碼一分鐘 3.4個，一小時200個，每個頁碼一元.`1
+# check if footnote and ndef align
+node checknote
+
+# convert to page base footnote numbering
+node changendef
