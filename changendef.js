@@ -40,23 +40,26 @@ var processfile=function(fn){
 
 	var content=fs.readFileSync(sourcepath+fn,"utf8");
 	var agama=fn.substr(0,1);
-	var page="",seq=0,notecount=0,prevgroup;
+	var evenpage=0,seq=0,prevoldseq=0,notecount=0,prevgroup;
 	content=content.replace(/([~#])([demps.0-9]+)/g,function(m,type,id){
 		if (type=="#") {
 			seq++;
 			notecount++;
 			var at=id.indexOf(".");
 			var group=id.substr(1,at-1);
-			var first=parseInt(id.substr(at+1));
+			var oldseq=parseInt(id.substr(at+1));
 
-			if (group!=prevgroup && first!==1){
-				console.log(fn,"note not start from 1,group",group)
+			if (group!=prevgroup && (oldseq!==1 || oldseq!==prevoldseq+1)){
+				console.log(fn,"note seq problem,group",group,prevoldseqoldseq);
 			}
 			prevgroup=group;
-			var newid=page+"."+seq;
+			prevoldseq=oldseq;
+			var newid=evenpage+"."+seq;
 			return type+newid;
 		} else {
-			page=agama+id;
+			id=parseInt(id);
+			if (id%2==1) id--;
+			evenpage=agama+id; //use even page number to group footnote
 			seq=0;
 			return type+agama+id;
 		}
