@@ -41,7 +41,7 @@ var processfile=function(fn){
 	var content=fs.readFileSync(sourcepath+fn,"utf8");
 	var agama=fn.substr(0,1);
 	var evenpage=0,seq=0,prevoldseq=0,notecount=0,prevgroup;
-	content=content.replace(/([~#])([demps.0-9]+)/g,function(m,type,id){
+	content=content.replace(/([~#])([ademps.0-9]+)/g,function(m,type,id){
 		if (type=="#") {
 			seq++;
 			notecount++;
@@ -49,8 +49,8 @@ var processfile=function(fn){
 			var group=id.substr(1,at-1);
 			var oldseq=parseInt(id.substr(at+1));
 
-			if (group!=prevgroup && (oldseq!==1 || oldseq!==prevoldseq+1)){
-				console.log(fn,"note seq problem,group",group,prevoldseqoldseq);
+			if (group!=prevgroup && (oldseq!==1 && oldseq!==prevoldseq+1)){
+				console.log(fn,id,"note seq problem,group",group,"previous group",prevgroup,"prev seq",prevoldseq,"seq",oldseq);
 			}
 			prevgroup=group;
 			prevoldseq=oldseq;
