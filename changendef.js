@@ -35,13 +35,21 @@ var loadnote=function(fn){
 
 	return out;
 }
+var d1workaround=function(page,notecount){
+	if (notecount==0){
+		return "d1p";
+	} else if (notecount==6) {
+		return "d2p";
+	}
+	else return page;
+}
 var processfile=function(fn){
 	var note=loadnote(fn);
 
 	var content=fs.readFileSync(sourcepath+fn,"utf8");
 	var agama=fn.substr(0,1);
-	var oddpage=0,prevoddpage=0,seq=0,prevoldseq=0,notecount=0,prevgroup;
-	content=content.replace(/([~#])([ademps.0-9]+)/g,function(m,type,id){
+	var pbid=0,prevpage=0,seq=0,prevoldseq=0,notecount=0,prevgroup;
+	content=content.replace(/([~#%])([ademps.0-9]+)/g,function(m,type,id){
 		if (type=="#") {
 			var at=id.indexOf(".");
 			var group=id.substr(1,at-1);
@@ -59,7 +67,7 @@ var processfile=function(fn){
 			prevgroup=group;
 			prevoldseq=oldseq;
 			seq++;
-			var newid=oddpage+"."+seq;
+			var newid=pbid+"."+seq;
 			if (!note[notecount]){
 				console.log("too many note",notecount,fn)
 			} else {
@@ -69,17 +77,26 @@ var processfile=function(fn){
 			notecount++;totalnotecount++;
 
 			return type+newid;
-		} else {
+		} else if (type=="%") {//juan
+			//a new juan start, 
+			if (seq) {
+
+			}
+			seq=0;
+			return type+id;
+		} else if (type=="~"){//pb
 			id=parseInt(id);
-			previd=id;
-			if (id%2==0) id++;
-			oddpage=agama+id; //use even page number to group footnote
-			if (prevoddpage!==oddpage){
+			pbid=agama+id;
+			if (prevpage!==id && (id%2==0)){//even page reset footnote seq
 				seq=0;
 			}
-			prevoddpage=oddpage;
+			prevpage=id;
 			/*TODO workaround for DA1 preface*/
-			return type+agama+id;
+			if (fn=="da1.txt") {
+				pbid=d1workaround(pbid,notecount);
+				prevpbid=pbid;
+			}
+			return type+pbid;
 		}
 	});
 	if (agama=="s"){
